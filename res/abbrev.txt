@@ -1,0 +1,25 @@
+@	alias
+a	abdul
+a/l	anak lelaki
+a/p	anak perempuan
+ab	abdul
+abd	abdul
+assoc	associate
+b	bin
+bt	binti
+bte	binti
+d	doktor
+h	haji
+hjh	hajah
+hj	hajah
+ir	senior engineer
+m	mohammad
+md	mad
+mohd	mohammad
+muhd	mohammad
+prof	professor
+r	raden
+s	syeik
+sh	sharifa
+sy	syed
+w	wan    
