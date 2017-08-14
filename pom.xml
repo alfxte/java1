@@ -1,0 +1,27 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ns.blank</groupId>
+  <artifactId>simple-tts</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>SimpleTTS</name>
+  <description>				</description>
+  <repositories>
+  	<repository>
+	  	<id>clojars.org</id>
+	  	<name>clojars.org</name>
+	  	<url>http://clojars.org/repo/</url>
+  	</repository>
+  </repositories>
+  <dependencies>
+  	<!-- <dependency>
+	    <groupId>com.jsyn</groupId>
+	    <artifactId>jsyn</artifactId>
+	    <version>20170328</version>
+	</dependency> -->
+	<dependency>
+	   <groupId>org.cacheonix</groupId>
+	   <artifactId>cacheonix-core</artifactId>
+	   <version>2.3.1</version>
+	</dependency>
+  </dependencies>   
+</project>
