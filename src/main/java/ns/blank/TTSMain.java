@@ -20,7 +20,7 @@ public class TTSMain {
 		
 		UnitStorage.prepare("./res/unit_storage/");
 		
-		TextProcessor processor = new TextProcessor("m150bisa", "./res/abbrev.txt");
+		TextProcessor processor = new TextProcessor("PD phd h. m. abdul salam 1994 m150bisa", "./res/abbrev.txt");
 		System.out.println(processor);
 		
 		SimpleTTS tts = new SimpleTTS(true);
