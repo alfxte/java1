@@ -5,9 +5,15 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 class UnitStorage {
-	/*package*/ static HashSet<String> sAllUnit;
-	public static void prepare(String unitStorageDir) {
-		File dir = new File(Utils.getFullPath(unitStorageDir));			
-		sAllUnit = new HashSet<>(Arrays.asList(dir.list()));
+	
+	/*package*/ static HashSet<String> sMonophoneUnit;
+	/*package*/ static HashSet<String> sDiphoneUnit;	
+	
+	public static void prepare(String basedir) {
+		File monophoneDir = new File(Utils.getFullPath(basedir + "/monophone/"));
+		File diphoneDir = new File(Utils.getFullPath(basedir + "/diphone/"));
+		
+		sMonophoneUnit = new HashSet<>(Arrays.asList(monophoneDir.list()));
+		sDiphoneUnit = new HashSet<>(Arrays.asList(diphoneDir.list()));
 	}
 }

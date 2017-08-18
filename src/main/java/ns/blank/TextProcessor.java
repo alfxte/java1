@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.StringJoiner;
 
+import ns.blank.Word.EWordType;
+
 class TextProcessor {		
 	
 	public static final String[] units = {
@@ -34,46 +36,47 @@ class TextProcessor {
             "seribu"   // 11
     };
 	
-	/*package*/ ArrayList<Word> mWords;		
+	/*package*/ ArrayList<Word> words;		
 	private HashMap<String, String> mMap;		
 	
 	public TextProcessor(String text, String rules1Files) {
-		mWords = new ArrayList<>();
-		mWords.addAll(Word.toWordList(text.split(" "))); // split by space			
-		for (int c = 0; c < mWords.size(); c++) {
-			Word word = mWords.get(c);
+		words = new ArrayList<>();
+		words.addAll(Word.toWordList(text.split(" "))); // split by space			
+		for (int c = 0; c < words.size(); c++) {
+			Word word = words.get(c);
 			if (!word.shouldProcess) {
 				continue;
 			}
 			
 			word.str = word.str.toLowerCase().replaceAll("[^a-zA-Z0-9]", "");
 			
-			//INFO: rule 1
-			if (word.str.length() < 3) {
-				try {
-					Word res1 = applyRule1(word, rules1Files);
+			//INFO: rule 1			
+			try {
+				Word res1 = applyRule1(word, rules1Files);
+				if (res1 != null) { // reach here, means rule1 got applied
 					if (res1.str.contains("_")) { //it means the abbreviation not available on abbrev.txt
 						List<Word> list = Word.toWordList(Arrays.asList(res1.str.split("_")));
+						list.forEach((w) -> w.type = EWordType.MONOPHONE);
 						// replace the current position word with the splited word
-						mWords.remove(c);
-						mWords.addAll(c, list);
+						words.remove(c);
+						words.addAll(c, list);						
 						c += list.size()-1; // increment the counter based on the new list size
 					} else {
-						mWords.set(c, res1);
-					}												
-				} catch (IOException e) {					
-					e.printStackTrace();
-				}
-				System.out.println(getClass().getSimpleName() + ">> rule1 applied to : " + word);
-				continue;
-			}
+						words.set(c, res1);
+					}
+					System.out.println(getClass().getSimpleName() + ">> rule1 applied to : " + word);
+					continue;
+				}				
+			} catch (IOException e) {					
+				e.printStackTrace();
+			}			
 			
 			
 			//INFO: rule 3
 			try {					
-				List<Word> list = applyRule3(word); // if success means `word` variable is number  
-				mWords.remove(c);
-				mWords.addAll(c, list);
+				List<Word> list = applyRule3(word); // if success, means `word` variable is number  
+				words.remove(c);
+				words.addAll(c, list);
 				c += list.size()-1; // increment the counter based on the new list size
 				System.out.println(getClass().getSimpleName() + ">> rule3 applied to : " + word);
 				continue;
@@ -89,8 +92,8 @@ class TextProcessor {
 				List<Word> res = applyRule4(word.str);					
 				if (res != null) {
 					// remove current elem, changed to sliced form, then decrement the counter to redo current data
-					mWords.remove(c);						
-					mWords.addAll(c, res);						
+					words.remove(c);						
+					words.addAll(c, res);						
 					c--;
 				}										
 				continue;
@@ -100,8 +103,8 @@ class TextProcessor {
 		
 		
 	}
+	/*package*/ Word applyRule1(Word word, String rulesFiles) throws FileNotFoundException, IOException {			
 	
-	private Word applyRule1(Word word, String rulesFiles) throws FileNotFoundException, IOException {			
 		if (mMap == null) {
 			mMap = new HashMap<String, String>();
 			String path = Utils.getFullPath(rulesFiles);
@@ -114,27 +117,40 @@ class TextProcessor {
 			}				
 		}			 			
 		String retval = mMap.get(word.str);
+		// not found
 		if (retval == null) {
-			retval = ""; 
-			// get char in string except the last one
-			char[] dst = new char[word.str.length()-1];
-			word.str.getChars(0, dst.length, dst, 0); 
-			// insert '_' between char
-			for (char c : dst) {
-				retval += (char)c + "_";					
+			// is available on unit storage?
+			if (UnitStorage.sDiphoneUnit.contains(word.str+".wav")) {
+				retval = word.str;
+			} 
+			// TODO: not really sure
+			// should we user the length of the text as the trigger or not?
+			else if (word.str.length() < 3 || word.isMonophone())  { 			
+				retval = ""; 
+				// get char in string except the last one
+				char[] dst = new char[word.str.length()-1];
+				word.str.getChars(0, dst.length, dst, 0); 
+				// insert '_' between char
+				for (char c : dst) {
+					retval += (char)c + "_";					
+				}
+				retval += word.str.charAt(dst.length); // append the last char
+			} else {
+				// means rule 1 not applicable for the text
+				return null;
 			}
-			retval += word.str.charAt(dst.length); // append the last char
+			
 		}
-		return  new Word(retval, true);			
+		return new Word(retval, true);			
 		
 	}
 	
-	public static List<Word> applyRule3(Word word) throws NumberFormatException, NullPointerException {			
+	/*package*/ List<Word> applyRule3(Word word) throws NumberFormatException, NullPointerException {			
 		String res = convertIntToStringRep(Integer.parseInt(word.str));			
 		return Word.toWordList(res.split(" "));
 	}
 	
-	private static String convertIntToStringRep(int n) {
+	private String convertIntToStringRep(int n) {
 		if (n < 0) {
 			return "minus " + convertIntToStringRep(-n);
 		}
@@ -179,7 +195,7 @@ class TextProcessor {
 	}
 	
 	
-	public static List<Word> applyRule4(String text) {
+	/*package*/ List<Word> applyRule4(String text) {
 		String[] split = text.split("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)");
 		// remove current elem, changed to sliced form, then decrement the coutner to redo current
 		
@@ -202,7 +218,7 @@ class TextProcessor {
 			s += text;
 		}*/			
 		StringJoiner joiner = new StringJoiner(" || ");
-        for (Word w : mWords ) {	        	
+        for (Word w : words ) {	        	
             joiner.add(w.str);
         }	        
         return joiner.toString();			 

@@ -5,6 +5,20 @@ import java.util.List;
 
 class Word {
 	
+	enum EWordType {
+		MONOPHONE,
+		DIPHONE,
+		TRIPHONE
+	}
+	
+	public static List<Word> toWordList(List<String> list, EWordType wordtype) {
+		ArrayList<Word> words = new ArrayList<>();
+		list.forEach((str) -> {
+			words.add(new Word(str, true, wordtype));
+		}); 
+		return words;
+	}
+	
 	public static List<Word> toWordList(List<String> list) {
 		ArrayList<Word> words = new ArrayList<>();
 		list.forEach((str) -> {
@@ -22,7 +36,14 @@ class Word {
 	}
 	
 	String str = "";
-	boolean shouldProcess = true;		
+	boolean shouldProcess = true;	
+	EWordType type = EWordType.DIPHONE;
+	
+	public Word(String word, boolean shouldProcess, EWordType wordType) {
+		this.str = word;
+		this.shouldProcess = shouldProcess;
+		this.type = wordType;
+	}
 	
 	public Word(String word, boolean shouldProcess) {
 		this.str = word;
@@ -31,6 +52,18 @@ class Word {
 	
 	public Word(String word) {
 		this.str = word;
+	}
+	
+	public boolean isDiphone() {
+		return type == EWordType.DIPHONE;
+	}
+	
+	public boolean isMonophone() {
+		return type == EWordType.MONOPHONE;
+	}
+	
+	public boolean isTriphone() {
+		return type == EWordType.TRIPHONE;
 	}
 	
 	@Override
